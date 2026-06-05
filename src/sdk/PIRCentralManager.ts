@@ -544,6 +544,7 @@ class PIRCentralManager {
       }
 
       this.connectStatus = CentralConnectStatus.Connected;
+      this.clearDisconnectTypeNotified();
       this.attachDeviceDisconnectMonitor(this.connectedDevice);
       return this.connectedDevice;
     } catch (e) {

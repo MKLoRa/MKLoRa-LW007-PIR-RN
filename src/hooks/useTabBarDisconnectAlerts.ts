@@ -1,5 +1,4 @@
 import {useCallback, useEffect, useRef} from 'react';
-import {Alert} from 'react-native';
 import PIRCentralManager, {
   type TabBarDisconnectListener,
 } from '../sdk/PIRCentralManager';
@@ -10,7 +9,7 @@ import {
   DISCONNECT_ALERT_BT_UNAVAILABLE,
   DISCONNECT_ALERT_DEVICE_OFF,
 } from '../utils/disconnectMessages';
-import {prepareDisconnectUi} from '../utils/disconnectUi';
+import {showGlobalDisconnectAlert} from '../utils/disconnectAlert';
 
 /**
  * 对齐 iOS MKPIRTabBarController：全局监听断开，点确定后一律回扫描页。
@@ -19,19 +18,13 @@ export function useTabBarDisconnectAlerts() {
   const disconnectTypeHandled = useRef(false);
 
   const showAlert = useCallback((title: string, message: string) => {
-    prepareDisconnectUi();
-    Alert.alert(title || ' ', message, [
-      {
-        text: 'OK',
-        onPress: () => {
-          disconnectTypeHandled.current = false;
-          // 对齐 iOS TabBar：Debugger 模式断开仅提示，不自动回扫描页
-          if (!PIRConnectModel.shared().isDebuggerMode()) {
-            void resetToScan();
-          }
-        },
-      },
-    ]);
+    showGlobalDisconnectAlert(title, message, () => {
+      disconnectTypeHandled.current = false;
+      // 对齐 iOS TabBar：Debugger 模式断开仅提示，不自动回扫描页
+      if (!PIRConnectModel.shared().isDebuggerMode()) {
+        void resetToScan();
+      }
+    });
   }, []);
 
   useEffect(() => {
